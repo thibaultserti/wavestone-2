@@ -12,7 +12,6 @@ export AWS_SECRET_ACCESS_KEY=<la secret access key>
 
 Avant d'exécuter les commandes Terraform vous devez `source .env` pour charger les clés d'accès en mémoire.
 
+Avant le premier lancement vous devez faire `terraform init` pour initialiser le projet et télécharger les plugins nécessaires.
 
 Note : ces instructions ne fonctionnent que sous Linux ou MacOS.
-
-Pour générer la clé SSH nécessaire au provisionning des VMs, lancez la commande suivante `ssh-keygen -f terraform_key` et appuyez sur <kbd>Entrée</kbd> pour ne pas configurer de passphrase.

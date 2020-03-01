@@ -2,9 +2,13 @@ provider "aws" {
   region = "eu-west-3"
 }
 
+resource "tls_private_key" "terraform_key" {
+  algorithm = "RSA"
+}
+
 resource "aws_key_pair" "terraform_key" {
   key_name   = "terraform_key"
-  public_key = file("./terraform_key.pub")
+  public_key = tls_private_key.terraform_key.public_key_openssh
 }
 
 resource "aws_instance" "webserver" {
@@ -21,7 +25,7 @@ resource "aws_instance" "webserver" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("./terraform_key")
+    private_key = tls_private_key.terraform_key.private_key_pem
     host        = self.public_ip
   }
 

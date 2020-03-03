@@ -7,10 +7,6 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 }
 
-data "aws_route_table" "main_vpc_route_table" {
-  vpc_id = aws_vpc.main.id
-}
-
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 }

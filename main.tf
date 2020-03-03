@@ -46,7 +46,6 @@ resource "aws_elb" "elb1" {
     lb_protocol       = "http"
   }
   security_groups = [
-    aws_security_group.allow_ssh.id,
     aws_security_group.allow_outbound.id,
     aws_security_group.allow_http_traffic.id
   ]
@@ -74,9 +73,8 @@ resource "aws_launch_configuration" "webserver" {
 
   security_groups = [
     aws_security_group.allow_outbound.id,
-    aws_security_group.allow_http_traffic_from_lb.id
+    aws_elb.elb1.source_security_group_id
   ]
-
 }
 
 resource "aws_autoscaling_group" "bar" {

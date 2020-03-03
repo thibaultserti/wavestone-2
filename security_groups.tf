@@ -21,3 +21,26 @@ resource "aws_security_group" "allow_http_traffic" {
     cidr_blocks = [var.rez_cidr]
   }
 }
+
+resource "aws_security_group" "allow_traffic_with_elb" {
+  name        = "allow_traffic_elb"
+  description = "Allow traffic with ELB"
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    security_groups = [
+      aws_elb.elb1.source_security_group_id
+    ]
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    security_groups = [
+      aws_elb.elb1.source_security_group_id
+    ]
+  }
+}

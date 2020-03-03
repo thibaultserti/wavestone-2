@@ -35,9 +35,13 @@ resource "aws_autoscaling_group" "bar" {
   launch_configuration = aws_launch_configuration.webserver.name
   min_size             = 2
   max_size             = 2
-  availability_zones   = data.aws_availability_zones.allzones.names
-  health_check_type    = "ELB"
-  load_balancers       = [aws_elb.elb1.name]
+  vpc_zone_identifier = [
+    aws_subnet.main_a.id,
+    aws_subnet.main_b.id,
+    aws_subnet.main_c.id
+  ]
+  health_check_type = "ELB"
+  load_balancers    = [aws_elb.elb1.name]
 
   lifecycle {
     create_before_destroy = true

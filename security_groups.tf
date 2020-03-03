@@ -1,6 +1,7 @@
 resource "aws_security_group" "allow_outbound" {
   name        = "allow_outbound"
   description = "Allow outbound traffic"
+  vpc_id      = aws_vpc.main.id
 
   egress {
     from_port   = 0
@@ -13,6 +14,7 @@ resource "aws_security_group" "allow_outbound" {
 resource "aws_security_group" "allow_http_traffic" {
   name        = "allow_http"
   description = "Allow HTTP inbound traffic from Rez IPs"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port   = 80
@@ -25,6 +27,7 @@ resource "aws_security_group" "allow_http_traffic" {
 resource "aws_security_group" "allow_traffic_with_elb" {
   name        = "allow_traffic_elb"
   description = "Allow traffic with ELB"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port = 80

@@ -2,13 +2,17 @@ provider "aws" {
   region = "eu-west-3"
 }
 
-data "aws_availability_zones" "allzones" {
-  state = "available"
-}
 
 resource "aws_elb" "elb1" {
-  name               = "terraform-elb"
-  availability_zones = data.aws_availability_zones.allzones.names
+  name = "terraform-elb"
+
+  depends_on = [aws_internet_gateway.igw]
+
+  subnets = [
+    aws_subnet.main_a.id,
+    aws_subnet.main_b.id,
+    aws_subnet.main_c.id
+  ]
 
   listener {
     instance_port     = 80

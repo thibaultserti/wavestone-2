@@ -33,3 +33,15 @@ resource "aws_security_group" "allow_http_traffic" {
     cidr_blocks = [var.rez_cidr]
   }
 }
+
+resource "aws_security_group" "allow_http_traffic_from_lb" {
+  name        = "allow_http_from_lb"
+  description = "Allow HTTP from lb"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

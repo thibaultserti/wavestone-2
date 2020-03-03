@@ -1,0 +1,36 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "eu-west-3",
+    "source_ami_filter": {
+      "filters": {
+        "virtualization-type": "hvm",
+        "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+        "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "webserver-ubuntu-apache-{{timestamp}}"
+  }],
+  "provisioners": [
+    {
+        "type": "shell",
+        "inline":[
+          "sudo apt update",
+          "sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y",
+          "sudo apt install -y apache2",
+          "sudo systemctl start apache2",
+          "sudo systemctl enable apache2"
+        ]
+    }
+  ]
+}

@@ -11,31 +11,54 @@ resource "aws_key_pair" "terraform_key" {
   public_key = tls_private_key.terraform_key.public_key_openssh
 }
 
-resource "aws_instance" "webserver" {
-  ami           = "ami-096b8af6e7e8fb927"
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["webserver-ubuntu-apache-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["self"]
+}
+
+
+
+data "aws_availability_zones" "allzones" {
+  state = "available"
+}
+
+resource "aws_launch_configuration" "webserver" {
+  name_prefix   = "terraform-lc-example-"
+  image_id      = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   key_name      = aws_key_pair.terraform_key.key_name
 
-  vpc_security_group_ids = [
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  security_groups = [
     aws_security_group.allow_ssh.id,
     aws_security_group.allow_outbound.id,
     aws_security_group.allow_http_traffic.id
   ]
+}
 
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = tls_private_key.terraform_key.private_key_pem
-    host        = self.public_ip
-  }
+resource "aws_autoscaling_group" "bar" {
+  name                 = "terraform-asg-example"
+  launch_configuration = aws_launch_configuration.webserver.name
+  min_size             = 2
+  max_size             = 2
+  availability_zones   = data.aws_availability_zones.allzones.names
+  health_check_type    = "EC2"
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt update",
-      "sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y",
-      "sudo apt install -y apache2",
-      "sudo systemctl start apache2",
-      "sudo systemctl enable apache2"
-    ]
+  lifecycle {
+    create_before_destroy = true
   }
 }
